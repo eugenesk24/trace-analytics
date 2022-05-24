@@ -24,7 +24,7 @@ export function ObservabilitySideBar(props: { children: React.ReactNode }) {
   // tries to find an item where href is a prefix of the hash
   // if none will try to find an item where the hash is a prefix of href
   function setIsSelected(
-    items: EuiSideNavItemType<React.ReactNode>[],
+    items: Array<EuiSideNavItemType<React.ReactNode>>,
     hash: string,
     initial = true,
     reverse = false
@@ -32,7 +32,7 @@ export function ObservabilitySideBar(props: { children: React.ReactNode }) {
     // Default page is Events Analytics
     // But it is kept as second option in side nav
     if (hash === '#/') {
-      items[0].items[2].isSelected = true;
+      items[0].items![2].isSelected = true;
       return true;
     }
     for (let i = 0; i < items.length; i++) {
@@ -92,7 +92,7 @@ export function ObservabilitySideBar(props: { children: React.ReactNode }) {
     },
   ];
   setIsSelected(items, location.hash);
-  const [isDarkMode, setIsDarkMode] = useState(uiSettingsService.get('theme:darkMode'));
+  const [isDarkMode, setIsDarkMode] = useState(uiSettingsService.get('theme:darkMode') !== '');
 
   return (
     <EuiPage>

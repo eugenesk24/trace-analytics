@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { TraceDetailRender } from '../../../../application_analytics/components/flyout_components/trace_detail_render';
+import { TraceDetailRender } from '../../../../integrations/application_analytics/components/flyout_components/trace_detail_render';
 import React, { useEffect } from 'react';
 import { HttpSetup } from '../../../../../../../../src/core/public';
 import { EuiCallOut, EuiLink } from '@elastic/eui';

@@ -25,7 +25,7 @@ import {
 import { selectQueryTabs, setSelectedQueryTab } from '../redux/slices/query_tab_slice';
 import { selectQueries } from '../redux/slices/query_slice';
 import { selectQueryResult } from '../redux/slices/query_result_slice';
-import { initializeTabData, removeTabData } from '../../application_analytics/helpers/utils';
+import { initializeTabData, removeTabData } from '../../integrations/application_analytics/helpers/utils';
 
 const searchBarConfigs = {
   [TAB_EVENT_ID]: {

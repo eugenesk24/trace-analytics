@@ -180,6 +180,7 @@ export function ServiceMap({
         )}
         <EuiSpacer size="m" />
         <EuiButtonGroup
+          legend="These are the different types of service maps"
           options={toggleButtons}
           idSelected={idSelected}
           onChange={(id) => setIdSelected(id as 'latency' | 'error_rate' | 'throughput')}

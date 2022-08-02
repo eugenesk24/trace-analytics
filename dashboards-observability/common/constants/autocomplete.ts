@@ -63,10 +63,37 @@ export interface IndexItem {
   label: string;
 }
 
+export interface CatalogItem {
+  label: string;
+}
+
 export interface DataItem {
   label: string;
   doc_count: any;
 }
+
+// Function to filter out currently inputed suggestions
+export const filterSuggestions = (suggestions: AutocompleteItem[], prefix: string) => {
+  return suggestions.filter(
+    ({ itemName }) =>
+      itemName.toLowerCase().startsWith(prefix) && prefix.localeCompare(itemName.toLowerCase())
+  );
+};
+
+// Function to create the array of objects to be suggested
+export const fillSuggestions = (str: string, word: string, items: any): AutocompleteItem[] => {
+  const lowerWord = word.toLowerCase();
+  const suggestionList = [];
+  for (let i = 0; i < items.length; i++) {
+    suggestionList.push({
+      label: str.substring(0, str.lastIndexOf(word)) + items[i].label,
+      input: str,
+      suggestion: items[i].label.substring(word.length),
+      itemName: items[i].label,
+    });
+  }
+  return filterSuggestions(suggestionList, lowerWord);
+};
 
 const JUST_SEARCH_REGEX = /\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#]*(\s*,\s*[^\\\/\?\"\<\>\|\s\,\#]+)*/;
 const SEARCH_WHERE_REGEX = /\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#]*(\s*,\s*[^\\\/\?\"\<\>\|\s\,\#]+)*\s*\|\s*where\s+\S+\s*=\s*\S+/;
@@ -143,6 +170,14 @@ export const INDEX_AFTER_EQUAL = /^\s*source\s+=\s+[^\\\/\?\"\<\>\|\s\,\#]*$/;
 export const PIPE_COMMA_AFTER_INDEX = /^\s*source\s+=\s+[^\\\/\?\"\<\>\|\s\,\#]+(,[^\\\/\?\"\<\>\|\s\,\#]+)*\s+$/;
 export const MORE_INDEX_AFTER_COMMA = /^\s*source\s+=\s+[^\\\/\?\"\<\>\|\s\,\#]+(,[^\\\/\?\"\<\>\|\s\,\#]+)*,\s*[^\\\/\?\"\<\>\|\s\,\#]*\s*$/;
 
+// Regex for prometheus commands
+export const CATALOG_AFTER_EQUAL = /^\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]*$/;
+export const DOT_AFTER_CATALOG = /^\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#]+(,[^\\\/\?\"\<\>\|\s\,\#]+)*\s+$/;
+export const INDEX_AFTER_DOT = /^\s*source\s+=\s+[^\\\/\?\"\<\>\|\s\,\#]+(,[^\\\/\?\"\<\>\|\s\,\#]+)*\.\s*\S*$/;
+const PROM_JUST_SEARCH_REGEX = /\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#]*(\s*,\s*[^\\\/\?\"\<\>\|\s\,\#\.]+)*\s*$/;
+const PROM_SEARCH_WHERE_REGEX = /\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#]*(\s*,\s*[^\\\/\?\"\<\>\|\s\,\#]+)*\s*\|\s*where\s+\S+\s*=\s*\S+/;
+const PROM_SEARCH_MATCH_REGEX = /\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#]*(\s*,\s*[^\\\/\?\"\<\>\|\s\,\#]+)*\s*\|\s*where\s+match\(\S+,\s*\S+\)/;
+
 export const regexForSuggestion = [
   EMPTY_REGEX,
   FIELD_AFTER_COMMAND,
@@ -195,8 +230,19 @@ export const regexForSuggestion = [
   MORE_INDEX_AFTER_COMMA,
 ];
 
+export const regexForPromSuggestion = [
+  EQUAL_AFTER_SOURCE,
+  CATALOG_AFTER_EQUAL,
+  INDEX_AFTER_DOT,
+  DOT_AFTER_CATALOG,
+]
+
 export const regexForIndex = [
   JUST_SEARCH_REGEX,
   SEARCH_WHERE_REGEX,
   SEARCH_MATCH_REGEX,
+];
+
+export const regexForCatalog = [
+  PROM_JUST_SEARCH_REGEX,
 ];

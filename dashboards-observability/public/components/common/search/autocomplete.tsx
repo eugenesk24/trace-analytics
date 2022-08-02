@@ -12,7 +12,7 @@ import { EuiFieldText, EuiTextArea } from '@elastic/eui';
 import DSLService from 'public/services/requests/dsl';
 import { IQueryBarProps } from './search';
 import { uiSettingsService } from '../../../../common/utils';
-import { AutocompleteItem } from '../../../../common/constants/autocomplete';
+import { AutocompleteItem, pipeCommands } from '../../../../common/constants/autocomplete';
 
 interface AutocompleteProps extends IQueryBarProps {
   getSuggestions: (
@@ -43,7 +43,7 @@ export const Autocomplete = (props: AutocompleteProps) => {
     baseQuery,
     tabId = '',
     placeholder = 'Enter PPL query',
-    possibleCommands,
+    possibleCommands = pipeCommands,
     append,
   } = props;
 

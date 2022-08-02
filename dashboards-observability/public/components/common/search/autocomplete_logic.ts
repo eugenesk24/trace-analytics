@@ -65,6 +65,8 @@ import {
   INDEX_AFTER_EQUAL,
   PIPE_COMMA_AFTER_INDEX,
   MORE_INDEX_AFTER_COMMA,
+  fillSuggestions,
+  filterSuggestions,
 } from '../../../../common/constants/autocomplete';
 
 let currIndices: string[] = [];
@@ -98,7 +100,7 @@ const getFields = async (dslService: DSLService): Promise<void> => {
       const index = currIndices[i];
       const res = await dslService.fetchFields(index);
       if (!res) {
-        return;
+        continue;
       }
       const resFieldList = Object.keys(res?.[index].mappings.properties);
       for (let j = 0; j < resFieldList.length; j++) {
@@ -163,29 +165,6 @@ export const onItemSelect = async (
     getFields(dslService);
   }
   setQuery(item.label + ' ');
-};
-
-// Function to create the array of objects to be suggested
-const fillSuggestions = (str: string, word: string, items: any): AutocompleteItem[] => {
-  const lowerWord = word.toLowerCase();
-  const suggestionList = [];
-  for (let i = 0; i < items.length; i++) {
-    suggestionList.push({
-      label: str.substring(0, str.lastIndexOf(word)) + items[i].label,
-      input: str,
-      suggestion: items[i].label.substring(word.length),
-      itemName: items[i].label,
-    });
-  }
-  return filterSuggestions(suggestionList, lowerWord);
-};
-
-// Function to filter out currently inputed suggestions
-const filterSuggestions = (suggestions: AutocompleteItem[], prefix: string) => {
-  return suggestions.filter(
-    ({ itemName }) =>
-      itemName.toLowerCase().startsWith(prefix) && prefix.localeCompare(itemName.toLowerCase())
-  );
 };
 
 export const parseForIndices = (query: string) => {

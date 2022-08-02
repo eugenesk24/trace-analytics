@@ -14,11 +14,12 @@ import {
   fillSuggestions,
   filterSuggestions,
   IndexItem,
-  INDEX_AFTER_DOT,
+  METRIC_AFTER_DOT,
   pipeCommands,
   regexForPromSuggestion,
   regexForCatalog,
   CATALOG_AFTER_EQUAL,
+  PIPE_AFTER_METRIC,
 } from '../../../../common/constants/autocomplete';
 
 let currCatalog = '';
@@ -205,7 +206,7 @@ export const parseGetPromSuggestions = async (
         } else {
           return [];
         }
-      case INDEX_AFTER_DOT:
+      case METRIC_AFTER_DOT:
         return filterSuggestions(
           indicesFromBackend.map((index: IndexItem) => {
             return {
@@ -217,6 +218,8 @@ export const parseGetPromSuggestions = async (
           }),
           lastWord
         );
+      case PIPE_AFTER_METRIC:
+        return fillSuggestions(currQuery, lastWord, [{ label: '|' }]);
     }
   }
 

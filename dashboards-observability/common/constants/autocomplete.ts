@@ -172,11 +172,10 @@ export const MORE_INDEX_AFTER_COMMA = /^\s*source\s+=\s+[^\\\/\?\"\<\>\|\s\,\#]+
 
 // Regex for prometheus commands
 export const CATALOG_AFTER_EQUAL = /^\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]*$/;
-export const DOT_AFTER_CATALOG = /^\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#]+(,[^\\\/\?\"\<\>\|\s\,\#]+)*\s+$/;
-export const INDEX_AFTER_DOT = /^\s*source\s+=\s+[^\\\/\?\"\<\>\|\s\,\#]+(,[^\\\/\?\"\<\>\|\s\,\#]+)*\.\s*\S*$/;
-const PROM_JUST_SEARCH_REGEX = /\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#]*(\s*,\s*[^\\\/\?\"\<\>\|\s\,\#\.]+)*\s*$/;
-const PROM_SEARCH_WHERE_REGEX = /\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#]*(\s*,\s*[^\\\/\?\"\<\>\|\s\,\#]+)*\s*\|\s*where\s+\S+\s*=\s*\S+/;
-const PROM_SEARCH_MATCH_REGEX = /\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#]*(\s*,\s*[^\\\/\?\"\<\>\|\s\,\#]+)*\s*\|\s*where\s+match\(\S+,\s*\S+\)/;
+export const DOT_AFTER_CATALOG = /^\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]+(,[^\\\/\?\"\<\>\|\s\,\#\.]+)*\s+$/;
+export const METRIC_AFTER_DOT = /^\s*source\s+=\s+[^\\\/\?\"\<\>\|\s\,\#\.]+(,[^\\\/\?\"\<\>\|\s\,\#\.]+)*\.\s*\S*$/;
+export const PIPE_AFTER_METRIC = /^\s*source\s+=\s+[^\\\/\?\"\<\>\|\s\,\#\.]+(,[^\\\/\?\"\<\>\|\s\,\#\.]+)*\.\S+\s+$/;
+const PROM_JUST_SEARCH_REGEX = /\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]*(\s*,\s*[^\\\/\?\"\<\>\|\s\,\#\.]+)*\s*$/;
 
 export const regexForSuggestion = [
   EMPTY_REGEX,
@@ -233,8 +232,9 @@ export const regexForSuggestion = [
 export const regexForPromSuggestion = [
   EQUAL_AFTER_SOURCE,
   CATALOG_AFTER_EQUAL,
-  INDEX_AFTER_DOT,
+  METRIC_AFTER_DOT,
   DOT_AFTER_CATALOG,
+  PIPE_AFTER_METRIC,
 ]
 
 export const regexForIndex = [

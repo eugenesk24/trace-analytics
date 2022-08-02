@@ -20,16 +20,21 @@ import {
   regexForCatalog,
   CATALOG_AFTER_EQUAL,
   PIPE_AFTER_METRIC,
+  regexForMetric,
+  FIELD_AFTER_WHERE,
+  EQUAL_AFTER_FIELD,
 } from '../../../../common/constants/autocomplete';
 
 let currCatalog = '';
-let currIndex = '';
+let currMetric = '';
+let currField = '';
+let currFieldType = '';
 
 const catalogList: string[] = [];
-const indexList: string[] = [];
+const metricList: string[] = [];
 const fieldList: string[] = [];
 const catalogsFromBackend: CatalogItem[] = [];
-const indicesFromBackend: IndexItem[] = [];
+const metricsFromBackend: IndexItem[] = [];
 const fieldsFromBackend: FieldItem[] = [];
 
 const getCatalogs = async (DUMMY_API: any): Promise<void> => {
@@ -46,49 +51,46 @@ const getCatalogs = async (DUMMY_API: any): Promise<void> => {
 
 const getIndices = async (DUMMY_API: any): Promise<void> => {
   if (!isEmpty(currCatalog)) {
-    indicesFromBackend.length = 0;
+    metricsFromBackend.length = 0;
     const catalog = currCatalog;
-    const res = await DUMMY_API.getIndicesForCatalog(catalog);
+    const res = await DUMMY_API.getMetricsForCatalog(catalog);
     if (!res) {
       return;
     }
     for (let i = 0; i < res.length; i++) {
-      indicesFromBackend.push({ label: res[i] });
-      indexList.push(res[i]);
+      metricsFromBackend.push({ label: res[i] });
+      metricList.push(res[i]);
     }
   }
 };
 
 const getFields = async (DUMMY_API: any): Promise<void> => {
-  if (!isEmpty(currIndex)) {
+  if (!isEmpty(currMetric)) {
     fieldsFromBackend.length = 0;
-    // for (let i = 0; i < currIndices.length; i++) {
-    // const index = currIndices[i];
-    const index = currIndex;
-    const res = await DUMMY_API.fetchFields(index);
+    const metric = currMetric;
+    const res = await DUMMY_API.fetchFields(metric);
     if (!res) {
       // continue;
       return;
     }
-    const resFieldList = Object.keys(res?.[index].mappings.properties);
+    const resFieldList = Object.keys(res?.[metric].mappings.properties);
     for (let j = 0; j < resFieldList.length; j++) {
       const element = resFieldList[j];
       if (
-        res?.[index].mappings.properties[element].properties ||
-        res?.[index].mappings.properties[element].fields
+        res?.[metric].mappings.properties[element].properties ||
+        res?.[metric].mappings.properties[element].fields
       ) {
         fieldsFromBackend.push({ label: element, type: 'string' });
-      } else if (res?.[index].mappings.properties[element].type === 'keyword') {
+      } else if (res?.[metric].mappings.properties[element].type === 'keyword') {
         fieldsFromBackend.push({ label: element, type: 'string' });
       } else {
         fieldsFromBackend.push({
           label: element,
-          type: res?.[index].mappings.properties[element].type,
+          type: res?.[metric].mappings.properties[element].type,
         });
       }
       fieldList.push(element);
     }
-    // }
   }
 };
 
@@ -99,6 +101,19 @@ const parseForCatalog = (query: string) => {
       const afterEqual = query.substring(query.indexOf('=') + 1);
       const noSpaces = afterEqual.replace(/\s/g, '');
       return noSpaces;
+    }
+  }
+  return '';
+};
+
+const parseForMetric = (query: string) => {
+  for (let i = 0; i < regexForMetric.length; i++) {
+    const groupArray = regexForMetric[i].exec(query);
+    if (groupArray) {
+      const afterEqual = query.substring(query.indexOf('=') + 1);
+      const noSpaces = afterEqual.replace(/\s/g, '');
+      const afterDot = noSpaces.substring(query.indexOf('.') + 1);
+      return afterDot;
     }
   }
   return '';
@@ -121,7 +136,22 @@ export const onPromItemSelect = async (
   const DUMMY_API = {
     fetchFields: (index: string) => {
       return {
-        promQl: {
+        http_requests_total: {
+          mappings: {
+            properties: {
+              text_field: {
+                type: 'text',
+              },
+              keyword_field: {
+                type: 'keyword',
+              },
+              double_field: {
+                type: 'double',
+              },
+            },
+          },
+        },
+        http_requests_latency: {
           mappings: {
             properties: {
               text_field: {
@@ -140,14 +170,13 @@ export const onPromItemSelect = async (
     },
   };
 
-  if (indicesFromBackend.length === 0 && catalogList.includes(item.itemName)) {
+  if (metricsFromBackend.length === 0 && catalogList.includes(item.itemName)) {
     currCatalog = item.itemName;
     getIndices(DUMMY_API);
   }
 
-  if (fieldsFromBackend.length === 0 && indexList.includes(item.itemName)) {
-    // currIndices = [item.itemName];
-    currIndex = item.itemName;
+  if (fieldsFromBackend.length === 0 && metricList.includes(item.itemName)) {
+    currMetric = item.itemName;
     getFields(DUMMY_API);
   }
 
@@ -173,8 +202,42 @@ export const parseGetPromSuggestions = async (
     getListOfCatalogs: () => {
       return ['prometheus'];
     },
-    getIndicesForCatalog: () => {
+    getMetricsForCatalog: () => {
       return ['http_requests_total', 'http_requests_latency'];
+    },
+    fetchFields: (index: string) => {
+      return {
+        http_requests_total: {
+          mappings: {
+            properties: {
+              text_field: {
+                type: 'text',
+              },
+              keyword_field: {
+                type: 'keyword',
+              },
+              double_field: {
+                type: 'double',
+              },
+            },
+          },
+        },
+        http_requests_latency: {
+          mappings: {
+            properties: {
+              text_field: {
+                type: 'text',
+              },
+              keyword_field: {
+                type: 'keyword',
+              },
+              double_field: {
+                type: 'double',
+              },
+            },
+          },
+        },
+      };
     },
   };
 
@@ -208,7 +271,7 @@ export const parseGetPromSuggestions = async (
         }
       case METRIC_AFTER_DOT:
         return filterSuggestions(
-          indicesFromBackend.map((index: IndexItem) => {
+          metricsFromBackend.map((index: IndexItem) => {
             return {
               label: currQuery.substring(0, currQuery.lastIndexOf(lastWord)).trim() + index.label,
               input: currQuery,
@@ -220,6 +283,16 @@ export const parseGetPromSuggestions = async (
         );
       case PIPE_AFTER_METRIC:
         return fillSuggestions(currQuery, lastWord, [{ label: '|' }]);
+      case EMPTY_REGEX:
+        currMetric = parseForMetric(firstCommand);
+        await getFields(DUMMY_API);
+        currField = '';
+        currFieldType = '';
+        return fillSuggestions(currQuery, lastWord, possibleCommands);
+      case FIELD_AFTER_WHERE:
+        return fillSuggestions(currQuery, lastWord, fieldsFromBackend);
+      case EQUAL_AFTER_FIELD:
+        return fillSuggestions(currQuery, lastWord, [{ label: '=' }]);
     }
   }
 

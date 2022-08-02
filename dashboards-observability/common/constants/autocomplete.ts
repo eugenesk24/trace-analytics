@@ -172,10 +172,14 @@ export const MORE_INDEX_AFTER_COMMA = /^\s*source\s+=\s+[^\\\/\?\"\<\>\|\s\,\#]+
 
 // Regex for prometheus commands
 export const CATALOG_AFTER_EQUAL = /^\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]*$/;
-export const DOT_AFTER_CATALOG = /^\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]+(,[^\\\/\?\"\<\>\|\s\,\#\.]+)*\s+$/;
-export const METRIC_AFTER_DOT = /^\s*source\s+=\s+[^\\\/\?\"\<\>\|\s\,\#\.]+(,[^\\\/\?\"\<\>\|\s\,\#\.]+)*\.\s*\S*$/;
-export const PIPE_AFTER_METRIC = /^\s*source\s+=\s+[^\\\/\?\"\<\>\|\s\,\#\.]+(,[^\\\/\?\"\<\>\|\s\,\#\.]+)*\.\S+\s+$/;
-const PROM_JUST_SEARCH_REGEX = /\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]*(\s*,\s*[^\\\/\?\"\<\>\|\s\,\#\.]+)*\s*$/;
+export const DOT_AFTER_CATALOG = /^\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]+\s+$/;
+export const METRIC_AFTER_DOT = /^\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]+\.\s*[^\\\/\?\"\<\>\|\s\,\#\.]*$/;
+export const PIPE_AFTER_METRIC = /^\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]+\.[^\\\/\?\"\<\>\|\s\,\#\.]+\s+$/;
+export const COMMANDS_AFTER_PIPE = /^\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]+\.[^\\\/\?\"\<\>\|\s\,\#\.]+\s+$/;
+export const FIELD_AFTER_WHERE = /^\s*where\s+\S*$/;
+export const EQUAL_AFTER_FIELD = /^\s*where\s+\S+\s+$/;
+const PROM_CATALOG_REGEX = /\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]+\s*$/;
+const PROM_METRIC_REGEX = /\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]+\.[^\\\/\?\"\<\>\|\s\,\#\.]+$/;
 
 export const regexForSuggestion = [
   EMPTY_REGEX,
@@ -235,6 +239,9 @@ export const regexForPromSuggestion = [
   METRIC_AFTER_DOT,
   DOT_AFTER_CATALOG,
   PIPE_AFTER_METRIC,
+  EMPTY_REGEX,
+  FIELD_AFTER_WHERE,
+  EQUAL_AFTER_FIELD,
 ]
 
 export const regexForIndex = [
@@ -244,5 +251,9 @@ export const regexForIndex = [
 ];
 
 export const regexForCatalog = [
-  PROM_JUST_SEARCH_REGEX,
+  PROM_CATALOG_REGEX,
+];
+
+export const regexForMetric = [
+  PROM_METRIC_REGEX,
 ];

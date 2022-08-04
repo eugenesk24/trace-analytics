@@ -27,6 +27,14 @@ import {
   DataItem,
   DATA_AFTER_EQUAL,
   PIPE_AFTER_DATA,
+  statsCommands,
+  AGGREGATION_FOR_STATS,
+  numberTypes,
+  NUM_FIELD_AFTER_AGGREGATION,
+  CLOSE_AFTER_FIELD,
+  COMMA_PIPE_BY_AFTER_AGGREGATION,
+  FIELD_SPAN_AFTER_GROUP_BY,
+  CLOSE_AFTER_SPAN,
 } from '../../../../common/constants/autocomplete';
 
 let currCatalog = '';
@@ -379,6 +387,25 @@ export const parseGetPromSuggestions = async (
         return fillSuggestions(currQuery, lastWord, dataValuesFromBackend);
       case PIPE_AFTER_DATA:
         return fillSuggestions(currQuery, lastWord, [{ label: '|' }]);
+      case AGGREGATION_FOR_STATS:
+        return fillSuggestions(currQuery, lastWord, statsCommands);
+      case NUM_FIELD_AFTER_AGGREGATION:
+        const numberFields = fieldsFromBackend.filter((field: { type: string }) =>
+          numberTypes.includes(field.type)
+        );
+        return fillSuggestions(currQuery, lastWord, numberFields);
+      case CLOSE_AFTER_FIELD:
+        return fillSuggestions(currQuery, lastWord, [{ label: ')' }]);
+      case COMMA_PIPE_BY_AFTER_AGGREGATION:
+        return fillSuggestions(currQuery, lastWord, [
+          { label: ',' },
+          { label: '|' },
+          { label: 'by' },
+        ]);
+      case FIELD_SPAN_AFTER_GROUP_BY:
+        return fillSuggestions(currQuery, lastWord, [{ label: 'span(' }, ...fieldsFromBackend]);
+      case CLOSE_AFTER_SPAN:
+        return fillSuggestions(currQuery, lastWord, [{ label: ')' }]);
     }
   }
 

@@ -134,10 +134,10 @@ const getDataValues = async (
     const index = indices[i];
     const res = (await dslService.fetch(getDataValueQuery(index, field)))?.aggregations?.top_tags
       ?.buckets;
+    dataValuesFromBackend.length = 0;
     if (isEmpty(res)) {
       continue;
     }
-    dataValuesFromBackend.length = 0;
     res.forEach((e: any) => {
       if (fieldType === 'string') {
         dataValuesFromBackend.push({ label: '"' + e.key + '"', doc_count: e.doc_count });

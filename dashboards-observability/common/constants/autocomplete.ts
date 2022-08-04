@@ -177,9 +177,11 @@ export const METRIC_AFTER_DOT = /^\s*(search\s+source|source|index)\s*=\s*[^\\\/
 export const PIPE_AFTER_METRIC = /^\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]+\.[^\\\/\?\"\<\>\|\s\,\#\.]+\s+$/;
 export const COMMANDS_AFTER_PIPE = /^\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]+\.[^\\\/\?\"\<\>\|\s\,\#\.]+\s+$/;
 export const FIELD_AFTER_WHERE = /^\s*where\s+\S*$/;
-export const EQUAL_AFTER_FIELD = /^\s*where\s+\S+\s+$/;
+export const EQUAL_AFTER_FIELD = /^\s*where\s+([^=]+)\s+$/;
+export const DATA_AFTER_EQUAL = /^\s*where\s+[^=]+\s*=\s*\S*$/;
+export const PIPE_AFTER_DATA = /^\s*where\s+[^=]+\s*=\s*\S+\s+$/;
 const PROM_CATALOG_REGEX = /\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]+\s*$/;
-const PROM_METRIC_REGEX = /\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]+\.[^\\\/\?\"\<\>\|\s\,\#\.]+$/;
+const PROM_METRIC_REGEX = /\s*(search\s+source|source|index)\s*=\s*[^\\\/\?\"\<\>\|\s\,\#\.]+\.[^\\\/\?\"\<\>\|\s\,\#\.]+\s*$/;
 
 export const regexForSuggestion = [
   EMPTY_REGEX,
@@ -242,6 +244,8 @@ export const regexForPromSuggestion = [
   EMPTY_REGEX,
   FIELD_AFTER_WHERE,
   EQUAL_AFTER_FIELD,
+  DATA_AFTER_EQUAL,
+  PIPE_AFTER_DATA,
 ]
 
 export const regexForIndex = [

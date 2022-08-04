@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /*
  * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
@@ -23,6 +24,9 @@ import {
   regexForMetric,
   FIELD_AFTER_WHERE,
   EQUAL_AFTER_FIELD,
+  DataItem,
+  DATA_AFTER_EQUAL,
+  PIPE_AFTER_DATA,
 } from '../../../../common/constants/autocomplete';
 
 let currCatalog = '';
@@ -36,6 +40,7 @@ const fieldList: string[] = [];
 const catalogsFromBackend: CatalogItem[] = [];
 const metricsFromBackend: IndexItem[] = [];
 const fieldsFromBackend: FieldItem[] = [];
+const dataValuesFromBackend: DataItem[] = [];
 
 const getCatalogs = async (DUMMY_API: any): Promise<void> => {
   if (catalogsFromBackend.length === 0) {
@@ -53,7 +58,7 @@ const getIndices = async (DUMMY_API: any): Promise<void> => {
   if (!isEmpty(currCatalog)) {
     metricsFromBackend.length = 0;
     const catalog = currCatalog;
-    const res = await DUMMY_API.getMetricsForCatalog(catalog);
+    const res = DUMMY_API.getMetricsForCatalog(catalog);
     if (!res) {
       return;
     }
@@ -94,6 +99,33 @@ const getFields = async (DUMMY_API: any): Promise<void> => {
   }
 };
 
+const getDataValues = async (
+  metric: string,
+  catalog: string,
+  field: string,
+  fieldType: string,
+  DUMMY_API: any
+): Promise<void> => {
+  const res = await DUMMY_API.fetchDataValues(field, metric, catalog);
+  dataValuesFromBackend.length = 0;
+  if (isEmpty(res)) {
+    return;
+  }
+  res.forEach((e: any) => {
+    if (fieldType === 'string') {
+      dataValuesFromBackend.push({ label: '"' + e.key + '"', doc_count: e.doc_count });
+    } else if (fieldType === 'boolean') {
+      if (e.key === 1) {
+        dataValuesFromBackend.push({ label: 'True', doc_count: e.doc_count });
+      } else {
+        dataValuesFromBackend.push({ label: 'False', doc_count: e.doc_count });
+      }
+    } else if (fieldType !== 'geo_point') {
+      dataValuesFromBackend.push({ label: String(e.key), doc_count: e.doc_count });
+    }
+  });
+};
+
 const parseForCatalog = (query: string) => {
   for (let i = 0; i < regexForCatalog.length; i++) {
     const groupArray = regexForCatalog[i].exec(query);
@@ -112,7 +144,7 @@ const parseForMetric = (query: string) => {
     if (groupArray) {
       const afterEqual = query.substring(query.indexOf('=') + 1);
       const noSpaces = afterEqual.replace(/\s/g, '');
-      const afterDot = noSpaces.substring(query.indexOf('.') + 1);
+      const afterDot = noSpaces.substring(noSpaces.indexOf('.') + 1);
       return afterDot;
     }
   }
@@ -134,6 +166,9 @@ export const onPromItemSelect = async (
 ) => {
   // DUMMY API
   const DUMMY_API = {
+    getMetricsForCatalog: (catalog: string) => {
+      return ['http_requests_total', 'http_requests_latency'];
+    },
     fetchFields: (index: string) => {
       return {
         http_requests_total: {
@@ -142,8 +177,8 @@ export const onPromItemSelect = async (
               text_field: {
                 type: 'text',
               },
-              keyword_field: {
-                type: 'keyword',
+              bool_field: {
+                type: 'boolean',
               },
               double_field: {
                 type: 'double',
@@ -157,8 +192,8 @@ export const onPromItemSelect = async (
               text_field: {
                 type: 'text',
               },
-              keyword_field: {
-                type: 'keyword',
+              bool_field: {
+                type: 'boolean',
               },
               double_field: {
                 type: 'double',
@@ -202,10 +237,10 @@ export const parseGetPromSuggestions = async (
     getListOfCatalogs: () => {
       return ['prometheus'];
     },
-    getMetricsForCatalog: () => {
+    getMetricsForCatalog: (catalog: string) => {
       return ['http_requests_total', 'http_requests_latency'];
     },
-    fetchFields: (index: string) => {
+    fetchFields: (metric: string) => {
       return {
         http_requests_total: {
           mappings: {
@@ -213,8 +248,8 @@ export const parseGetPromSuggestions = async (
               text_field: {
                 type: 'text',
               },
-              keyword_field: {
-                type: 'keyword',
+              bool_field: {
+                type: 'boolean',
               },
               double_field: {
                 type: 'double',
@@ -228,8 +263,8 @@ export const parseGetPromSuggestions = async (
               text_field: {
                 type: 'text',
               },
-              keyword_field: {
-                type: 'keyword',
+              bool_field: {
+                type: 'boolean',
               },
               double_field: {
                 type: 'double',
@@ -238,6 +273,50 @@ export const parseGetPromSuggestions = async (
           },
         },
       };
+    },
+    fetchDataValues: (field: string, metric: string, catalog: string) => {
+      if (field === 'text_field') {
+        return [
+          {
+            key: 'hi',
+            doc_count: 1,
+          },
+          {
+            key: 'hello',
+            doc_count: 1,
+          },
+          {
+            key: 'hey',
+            doc_count: 1,
+          },
+        ];
+      } else if (field === 'bool_field') {
+        return [
+          {
+            key: 1,
+            doc_count: 12,
+          },
+          {
+            key: 0,
+            doc_count: 15,
+          },
+        ];
+      } else if (field === 'double_field') {
+        return [
+          {
+            key: 1234,
+            doc_count: 1,
+          },
+          {
+            key: 5678,
+            doc_count: 1,
+          },
+          {
+            key: 224,
+            doc_count: 1,
+          },
+        ];
+      }
     },
   };
 
@@ -292,7 +371,14 @@ export const parseGetPromSuggestions = async (
       case FIELD_AFTER_WHERE:
         return fillSuggestions(currQuery, lastWord, fieldsFromBackend);
       case EQUAL_AFTER_FIELD:
+        currField = next.exec(lastCommand)![1];
+        currFieldType = fieldsFromBackend.find((field) => field.label === currField)?.type || '';
+        await getDataValues(currCatalog, currMetric, currField, currFieldType, DUMMY_API);
         return fillSuggestions(currQuery, lastWord, [{ label: '=' }]);
+      case DATA_AFTER_EQUAL:
+        return fillSuggestions(currQuery, lastWord, dataValuesFromBackend);
+      case PIPE_AFTER_DATA:
+        return fillSuggestions(currQuery, lastWord, [{ label: '|' }]);
     }
   }
 

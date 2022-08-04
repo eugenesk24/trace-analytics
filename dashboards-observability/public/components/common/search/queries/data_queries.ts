@@ -5,15 +5,15 @@
 
 export const getDataValueQuery = (index: string, field: string) => {
   const query = {
-    index: index,
-    'size': 0,
-    'aggs': {
-      'top_tags': {
-        'terms': {
-          'field': field,
-        }
-      }
-    }
-  }
+    index,
+    size: 0,
+    aggs: {
+      top_tags: {
+        terms: {
+          field,
+        },
+      },
+    },
+  };
   return query;
-}
+};

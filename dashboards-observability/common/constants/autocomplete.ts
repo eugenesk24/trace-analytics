@@ -59,7 +59,7 @@ export interface FieldItem {
   type: string;
 }
 
-export interface IndexItem {
+export interface MetricItem {
   label: string;
 }
 

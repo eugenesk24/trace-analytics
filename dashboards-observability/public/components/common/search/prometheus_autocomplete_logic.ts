@@ -14,7 +14,7 @@ import {
   FieldItem,
   fillSuggestions,
   filterSuggestions,
-  IndexItem,
+  MetricItem,
   METRIC_AFTER_DOT,
   pipeCommands,
   regexForPromSuggestion,
@@ -46,7 +46,7 @@ const catalogList: string[] = [];
 const metricList: string[] = [];
 const fieldList: string[] = [];
 const catalogsFromBackend: CatalogItem[] = [];
-const metricsFromBackend: IndexItem[] = [];
+const metricsFromBackend: MetricItem[] = [];
 const fieldsFromBackend: FieldItem[] = [];
 const dataValuesFromBackend: DataItem[] = [];
 
@@ -177,7 +177,7 @@ export const onPromItemSelect = async (
     getMetricsForCatalog: (catalog: string) => {
       return ['http_requests_total', 'http_requests_latency'];
     },
-    fetchFields: (index: string) => {
+    fetchFields: (metric: string) => {
       return {
         http_requests_total: {
           mappings: {
@@ -358,12 +358,12 @@ export const parseGetPromSuggestions = async (
         }
       case METRIC_AFTER_DOT:
         return filterSuggestions(
-          metricsFromBackend.map((index: IndexItem) => {
+          metricsFromBackend.map((metric: MetricItem) => {
             return {
-              label: currQuery.substring(0, currQuery.lastIndexOf(lastWord)).trim() + index.label,
+              label: currQuery.substring(0, currQuery.lastIndexOf(lastWord)).trim() + metric.label,
               input: currQuery,
-              suggestion: index.label.substring(lastWord.length),
-              itemName: index.label,
+              suggestion: metric.label.substring(lastWord.length),
+              itemName: metric.label,
             };
           }),
           lastWord

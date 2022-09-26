@@ -83,7 +83,6 @@ const getFields = async (DUMMY_API: any): Promise<void> => {
     const metric = currMetric;
     const res = await DUMMY_API.fetchFields(metric);
     if (!res) {
-      // continue;
       return;
     }
     const resFieldList = Object.keys(res?.[metric].mappings.properties);

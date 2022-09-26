@@ -62,7 +62,7 @@ const getCatalogs = async (DUMMY_API: any): Promise<void> => {
   }
 };
 
-const getIndices = async (DUMMY_API: any): Promise<void> => {
+const getMetrics = async (DUMMY_API: any): Promise<void> => {
   if (!isEmpty(currCatalog)) {
     metricsFromBackend.length = 0;
     const catalog = currCatalog;
@@ -215,7 +215,7 @@ export const onPromItemSelect = async (
 
   if (metricsFromBackend.length === 0 && catalogList.includes(item.itemName)) {
     currCatalog = item.itemName;
-    getIndices(DUMMY_API);
+    getMetrics(DUMMY_API);
   }
 
   if (fieldsFromBackend.length === 0 && metricList.includes(item.itemName)) {
@@ -348,7 +348,7 @@ export const parseGetPromSuggestions = async (
         cat = parseForCatalog(firstCommand);
         if (catalogList.includes(cat)) {
           currCatalog = cat;
-          await getIndices(DUMMY_API);
+          await getMetrics(DUMMY_API);
           return filterSuggestions(
             [{ label: currQuery.trim() + '.', input: currQuery, suggestion: '.', itemName: '.' }],
             lastWord
